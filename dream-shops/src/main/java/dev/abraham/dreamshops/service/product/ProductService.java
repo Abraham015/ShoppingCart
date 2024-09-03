@@ -1,13 +1,18 @@
 package dev.abraham.dreamshops.service.product;
 
+import dev.abraham.dreamshops.dto.ImageDTO;
+import dev.abraham.dreamshops.dto.ProductDTO;
 import dev.abraham.dreamshops.exceptions.ProductNotFoundException;
 import dev.abraham.dreamshops.model.Category;
+import dev.abraham.dreamshops.model.Image;
 import dev.abraham.dreamshops.model.Product;
 import dev.abraham.dreamshops.repository.CategoryRepository;
+import dev.abraham.dreamshops.repository.ImageRepository;
 import dev.abraham.dreamshops.repository.ProductRepository;
 import dev.abraham.dreamshops.request.AddProductRequest;
 import dev.abraham.dreamshops.request.ProductUpdateRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +23,8 @@ import java.util.Optional;
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     public Product addProduct(AddProductRequest product) {
         Category category = Optional.ofNullable(categoryRepository.findByName(product.getCategory().getName()))
@@ -78,11 +85,12 @@ public class ProductService implements IProductService {
     }
 
     public List<Product> getProductsByBrand(String brandId) {
-        return productRepository.findByBrandName(brandId);
+        return productRepository.findByBrand(brandId);
     }
 
-    public List<Product> getProductsByCategoryAndBrand(String categoryId, String brandId) {
-        return productRepository.findByCategoryAndBrand(categoryId, brandId);
+    @Override
+    public List<Product> getProductsByCategoryAndBrand(String category, String brand) {
+        return productRepository.findByCategoryNameAndBrand(category, brand);
     }
 
     public List<Product> getProductsByName(String name) {
@@ -95,5 +103,19 @@ public class ProductService implements IProductService {
 
     public Long countProductsByBrandAndName(String brandId, String name) {
         return productRepository.countByBrandAndName(brandId, name);
+    }
+
+    public List<ProductDTO> getCastProducts(List<Product> products) {
+        return products.stream().map(this::castToProductDTO).toList();
+    }
+
+    public ProductDTO castToProductDTO(Product product) {
+        ProductDTO dto= modelMapper.map(product, ProductDTO.class);
+        List<Image> images=imageRepository.findByProductId(dto.getId());
+        List<ImageDTO> imageDTO=images.stream()
+                .map(image->modelMapper.map(image, ImageDTO.class))
+                .toList();
+        dto.setImages(imageDTO);
+        return dto;
     }
 }

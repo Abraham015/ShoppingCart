@@ -1,5 +1,6 @@
 package dev.abraham.dreamshops.service.product;
 
+import dev.abraham.dreamshops.dto.ProductDTO;
 import dev.abraham.dreamshops.model.Product;
 import dev.abraham.dreamshops.request.AddProductRequest;
 import dev.abraham.dreamshops.request.ProductUpdateRequest;
@@ -14,8 +15,12 @@ public interface IProductService {
     List<Product> getAllProducts();
     List<Product> getProductsByCategory(String categoryId);
     List<Product> getProductsByBrand(String brandId);
-    List<Product> getProductsByCategoryAndBrand(String categoryId, String brandId);
+    List<Product> getProductsByCategoryAndBrand(String category, String brand);
     List<Product> getProductsByName(String name);
     List<Product> getProductsByBrandAndName(String brandId, String name);
     Long countProductsByBrandAndName(String brandId, String name);
+
+    List<ProductDTO> getCastProducts(List<Product> products);
+
+    ProductDTO castToProductDTO(Product product);
 }
