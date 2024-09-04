@@ -1,6 +1,7 @@
 package dev.abraham.dreamshops.controller;
 
 import dev.abraham.dreamshops.dto.ProductDTO;
+import dev.abraham.dreamshops.exceptions.ProductExistsException;
 import dev.abraham.dreamshops.exceptions.ProductNotFoundException;
 import dev.abraham.dreamshops.model.Product;
 import dev.abraham.dreamshops.request.product.AddProductRequest;
@@ -123,8 +124,8 @@ public class ProductController {
         try{
             Product p=productService.addProduct(product);
             return ResponseEntity.ok(new APIResponse("Product added sucessfully", p));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new APIResponse(e.getMessage(), null));
+        } catch (ProductExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(e.getMessage(), null));
         }
     }
 

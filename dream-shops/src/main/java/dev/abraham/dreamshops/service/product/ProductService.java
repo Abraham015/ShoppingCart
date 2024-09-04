@@ -2,6 +2,7 @@ package dev.abraham.dreamshops.service.product;
 
 import dev.abraham.dreamshops.dto.ImageDTO;
 import dev.abraham.dreamshops.dto.ProductDTO;
+import dev.abraham.dreamshops.exceptions.ProductExistsException;
 import dev.abraham.dreamshops.exceptions.ProductNotFoundException;
 import dev.abraham.dreamshops.model.Category;
 import dev.abraham.dreamshops.model.Image;
@@ -27,6 +28,9 @@ public class ProductService implements IProductService {
     private final ImageRepository imageRepository;
 
     public Product addProduct(AddProductRequest product) {
+        if(productExists(product.getName(), product.getBrand())){
+            throw new ProductExistsException(product.getBrand()+" "+product.getName()+" already exists");
+        }
         Category category = Optional.ofNullable(categoryRepository.findByName(product.getCategory().getName()))
                 .orElseGet(()->{
                     Category c=new Category(product.getCategory().getName());
@@ -34,6 +38,10 @@ public class ProductService implements IProductService {
                 });
         product.setCategory(category);
         return productRepository.save(createProduct(product, category));
+    }
+
+    private boolean productExists(String name, String brand){
+        return productRepository.existsByNameAndBrand(name, brand);
     }
 
     private Product createProduct(AddProductRequest product, Category category) {
@@ -69,10 +77,11 @@ public class ProductService implements IProductService {
         existingProduct.setName(request.getName());
         existingProduct.setBrand(request.getBrand());
         existingProduct.setPrice(request.getPrice());
-        existingProduct.setInventory(request.getInventory());
         existingProduct.setDescription(request.getDescription());
         Category category = categoryRepository.findByName(request.getCategory().getName());
         existingProduct.setCategory(category);
+        int inventory = existingProduct.getInventory();
+        existingProduct.setInventory(request.getInventory()+inventory);
         return existingProduct;
     }
 
