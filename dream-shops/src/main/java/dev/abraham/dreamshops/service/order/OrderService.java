@@ -32,6 +32,7 @@ public class OrderService implements IOrderService {
     public Order placeOrder(Long userId) {
         Cart cart=cartService.getCartByUserId(userId);
         Order order=createOrder(cart);
+        order.setUser(cart.getUser());
         List<OrderItem> orderItemList=createOrderItems(order, cart);
         order.setOrderItems(new HashSet<>(orderItemList));
         order.setTotalAmount(calculateTotalAmount(orderItemList));
@@ -83,7 +84,7 @@ public class OrderService implements IOrderService {
                 .toList();
     }
 
-    private OrderDTO castToOrderDTO(Order order) {
+    public OrderDTO castToOrderDTO(Order order) {
         return modelMapper.map(order, OrderDTO.class);
     }
 }

@@ -1,5 +1,6 @@
 package dev.abraham.dreamshops.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.abraham.dreamshops.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -23,8 +23,9 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<APIResponse> getUserById(@PathVariable Long id) {
         try {
-            UserDTO user = userService.getUserById(id);
-            return ResponseEntity.ok(new APIResponse("User found", user));
+            User user = userService.getUserById(id);
+            UserDTO userDTO =userService.castToDTO(user);
+            return ResponseEntity.ok(new APIResponse("User found", userDTO));
         } catch (UserNotFound e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
@@ -33,8 +34,8 @@ public class UserController {
     @PostMapping("/add")
     public ResponseEntity<APIResponse> addUser(@RequestBody CreateUserRequest request) {
         try {
-            UserDTO user=userService.createUser(request);
-            return ResponseEntity.ok(new APIResponse("User added", user));
+            User user=userService.createUser(request);
+            return ResponseEntity.ok(new APIResponse("User added", userService.castToDTO(user)));
         } catch (UserExistsException e) {
             return ResponseEntity.status(CONFLICT).body(new APIResponse(e.getMessage(), null));
         }
@@ -43,8 +44,8 @@ public class UserController {
     @PutMapping("/update/{userId}")
     public ResponseEntity<APIResponse> updateUser(@RequestBody UpdateUserRequest request, @PathVariable Long userId) {
         try {
-            UserDTO user=userService.updateUser(request, userId);
-            return ResponseEntity.ok(new APIResponse("User updated", user));
+            User user=userService.updateUser(request, userId);
+            return ResponseEntity.ok(new APIResponse("User updated", userService.castToDTO(user)));
         } catch (UserNotFound e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
         }
