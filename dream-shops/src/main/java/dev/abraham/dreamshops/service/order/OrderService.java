@@ -1,5 +1,6 @@
 package dev.abraham.dreamshops.service.order;
 
+import dev.abraham.dreamshops.dto.OrderDTO;
 import dev.abraham.dreamshops.enums.OrderStatus;
 import dev.abraham.dreamshops.exceptions.OrderNotFound;
 import dev.abraham.dreamshops.model.Cart;
@@ -11,6 +12,7 @@ import dev.abraham.dreamshops.repository.ProductRepository;
 import dev.abraham.dreamshops.service.cart.ICartService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ICartService cartService;
+    private final ModelMapper modelMapper;
 
     @Transactional
     public Order placeOrder(Long userId) {
@@ -67,12 +70,20 @@ public class OrderService implements IOrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Order getOrder(Long orderId) {
+    public OrderDTO getOrder(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(()-> new OrderNotFound("Order not found"));
+                .map(this::castToOrderDTO)
+                .orElseThrow(()->new OrderNotFound("Order not found"));
     }
 
-    public List<Order> getUserOrders(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public List<OrderDTO> getUserOrders(Long userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(this::castToOrderDTO)
+                .toList();
+    }
+
+    private OrderDTO castToOrderDTO(Order order) {
+        return modelMapper.map(order, OrderDTO.class);
     }
 }
