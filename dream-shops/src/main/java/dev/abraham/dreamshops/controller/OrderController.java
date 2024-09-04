@@ -44,7 +44,7 @@ public class OrderController {
     @GetMapping("/{userId}")
     public ResponseEntity<APIResponse> getUserOrders(@PathVariable Long userId){
         try {
-            List<Order> order=orderService.getUserOrders(userId);
+            List<OrderDTO> order=orderService.getUserOrders(userId);
             return ResponseEntity.ok(new APIResponse("Orders obtained successfully", order));
         } catch (OrderNotFound e) {
             return ResponseEntity.status(NOT_FOUND).body(new APIResponse(e.getMessage(), null));
