@@ -8,11 +8,14 @@ import dev.abraham.dreamshops.model.OrderItem;
 import dev.abraham.dreamshops.model.Product;
 import dev.abraham.dreamshops.repository.OrderRepository;
 import dev.abraham.dreamshops.repository.ProductRepository;
+import dev.abraham.dreamshops.service.cart.ICartService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -20,9 +23,18 @@ import java.util.List;
 public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final ICartService cartService;
 
+    @Transactional
     public Order placeOrder(Long userId) {
-        return null;
+        Cart cart=cartService.getCartByUserId(userId);
+        Order order=createOrder(cart);
+        List<OrderItem> orderItemList=createOrderItems(order, cart);
+        order.setOrderItems(new HashSet<>(orderItemList));
+        order.setTotalAmount(calculateTotalAmount(orderItemList));
+        Order savedOrder=orderRepository.save(order);
+        cartService.clearCart(cart.getId());
+        return savedOrder;
     }
 
     private Order createOrder(Cart cart) {
@@ -58,5 +70,9 @@ public class OrderService implements IOrderService {
     public Order getOrder(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFound("Order not found"));
+    }
+
+    public List<Order> getUserOrders(Long userId) {
+        return orderRepository.findByUserId(userId);
     }
 }

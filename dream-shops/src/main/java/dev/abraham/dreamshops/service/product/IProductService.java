@@ -2,8 +2,8 @@ package dev.abraham.dreamshops.service.product;
 
 import dev.abraham.dreamshops.dto.ProductDTO;
 import dev.abraham.dreamshops.model.Product;
-import dev.abraham.dreamshops.request.AddProductRequest;
-import dev.abraham.dreamshops.request.ProductUpdateRequest;
+import dev.abraham.dreamshops.request.product.AddProductRequest;
+import dev.abraham.dreamshops.request.product.ProductUpdateRequest;
 
 import java.util.List;
 
