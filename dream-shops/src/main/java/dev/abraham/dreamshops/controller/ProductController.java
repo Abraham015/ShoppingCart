@@ -124,8 +124,6 @@ public class ProductController {
     @PostMapping("/add")
     public ResponseEntity<APIResponse> addProduct(@RequestBody AddProductRequest product) {
         try{
-
-            System.out.println("Si entra al endpoint");
             Product p=productService.addProduct(product);
             return ResponseEntity.ok(new APIResponse("Product added sucessfully", p));
         } catch (ProductExistsException e) {

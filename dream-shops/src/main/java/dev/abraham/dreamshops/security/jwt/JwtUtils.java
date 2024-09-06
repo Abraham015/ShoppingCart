@@ -16,8 +16,8 @@ import java.util.List;
 
 @Component
 public class JwtUtils {
-    @Value("${auth.token.jwtSecret}")
-    private String jwtSecret;
+    //@Value("${auth.token.jwtSecret}")
+    private final String jwtSecret="36763979244226452948404D635166546A576D5A7134743777217A25432A462D";
     @Value("${auth.token.expirationInMilis}")
     private int expirationTime;
 
@@ -26,14 +26,17 @@ public class JwtUtils {
         List<String> roles = userPrincipal.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority).toList();
-        return Jwts.builder().setSubject(userPrincipal.getEmail()).claim("id", userPrincipal.getId())
+        return Jwts.builder()
+                .setSubject(userPrincipal.getEmail())
+                .claim("id", userPrincipal.getId())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date().getTime())+expirationTime))
+                .setExpiration(new Date((new Date()).getTime()+expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();
     }
 
     private Key key() {
+        System.out.println("JWT Secret: " + jwtSecret);
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
@@ -42,10 +45,12 @@ public class JwtUtils {
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
-                .getBody().getSubject();
+                .getBody()
+                .getSubject();
     }
 
     public boolean validateToken(String token) {
+        System.out.println("Entra a validate token");
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key())

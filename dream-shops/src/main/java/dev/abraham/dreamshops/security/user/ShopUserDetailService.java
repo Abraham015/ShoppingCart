@@ -4,6 +4,7 @@ import dev.abraham.dreamshops.exceptions.UserNotFound;
 import dev.abraham.dreamshops.model.User;
 import dev.abraham.dreamshops.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
