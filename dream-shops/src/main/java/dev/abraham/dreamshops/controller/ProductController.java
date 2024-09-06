@@ -11,6 +11,7 @@ import dev.abraham.dreamshops.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -119,9 +120,12 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<APIResponse> addProduct(@RequestBody AddProductRequest product) {
         try{
+
+            System.out.println("Si entra al endpoint");
             Product p=productService.addProduct(product);
             return ResponseEntity.ok(new APIResponse("Product added sucessfully", p));
         } catch (ProductExistsException e) {
@@ -129,6 +133,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/update/{product_id}")
     public ResponseEntity<APIResponse> updateProduct(@RequestBody ProductUpdateRequest product, @PathVariable Long product_id) {
         try {
@@ -139,6 +144,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{product_id}")
     public ResponseEntity<APIResponse> deleteProduct(@PathVariable Long product_id) {
         try{

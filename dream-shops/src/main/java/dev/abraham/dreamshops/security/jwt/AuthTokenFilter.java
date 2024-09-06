@@ -44,6 +44,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             response.getWriter().write(e.getMessage());
             return;
         }
+        filterChain.doFilter(request, response);
     }
 
     private String passJwt(HttpServletRequest request) {
