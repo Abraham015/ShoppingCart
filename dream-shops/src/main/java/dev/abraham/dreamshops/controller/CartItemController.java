@@ -9,6 +9,7 @@ import dev.abraham.dreamshops.response.APIResponse;
 import dev.abraham.dreamshops.service.cart.ICartService;
 import dev.abraham.dreamshops.service.cartitem.ICartItemService;
 import dev.abraham.dreamshops.service.user.IUserService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,14 @@ public class CartItemController {
     @PostMapping("/add")
     public ResponseEntity<APIResponse> addItemToCart(@RequestParam Long productId, @RequestParam Integer quantity) {
         try {
-            User user=userService.getUserById(1L);
+            User user=userService.getAuthenticatedUser();
             Cart cart=cartService.initializeNewCart(user);
             cartItemService.addItem(cart.getId(), productId, quantity);
             return ResponseEntity.ok(new APIResponse("Item added sucessfully", null));
         } catch (CartNotFound | UserNotFound e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse(e.getMessage(), null));
+        } catch (JwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new APIResponse(e.getMessage(), null));
         }
     }
 

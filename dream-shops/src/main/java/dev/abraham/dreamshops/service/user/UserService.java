@@ -10,6 +10,9 @@ import dev.abraham.dreamshops.request.user.UpdateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class UserService implements IUserService {
     private UserRepository userRepository;
     private ModelMapper modelMapper;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, ModelMapper modelMapper) {
@@ -35,7 +39,7 @@ public class UserService implements IUserService {
         return Optional.of(request).filter(user->!userRepository.existsByEmail(request.getEmail())).map(req->{
             User user = new User();
             user.setEmail(request.getEmail());
-            user.setPassword(request.getPassword());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
             return userRepository.save(user);
@@ -58,5 +62,11 @@ public class UserService implements IUserService {
 
     public UserDTO castToDTO(User user) {
         return modelMapper.map(user, UserDTO.class);
+    }
+
+    public User getAuthenticatedUser() {
+        Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+        String email= auth.getName();
+        return userRepository.findByEmail(email);
     }
 }
